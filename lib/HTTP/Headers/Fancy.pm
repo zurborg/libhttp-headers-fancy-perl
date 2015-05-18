@@ -115,4 +115,45 @@ sub encode_hash {
     wantarray ? %headers : \%headers;
 }
 
+sub split_field {
+    shift if defined $_[0] and $_[0] eq __PACKAGE__;
+    my $value = shift;
+    return () unless defined $value;
+    pos($value) = 0;
+    my %data;
+    $value .= ',';
+    while ($value =~ m{
+        \G
+        \s*
+        (?<key>
+            [^=,]+?
+        )
+        \s*
+        (?:
+            \s*
+            =
+            \s*
+            (?:
+                (?:
+                    "
+                    (?<value>
+                        [^"]*?
+                    )
+                    "
+                )
+            |
+                (?<value>
+                    [^,]*?
+                )
+            )
+        )?
+        \s*
+        ,+
+        \s*
+    }gsx) {
+        $data{$+{key}} = $+{value};
+    }
+    return %data;
+}
+
 1;

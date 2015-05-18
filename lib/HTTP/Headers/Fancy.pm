@@ -115,7 +115,7 @@ sub encode_hash {
     wantarray ? %headers : \%headers;
 }
 
-=func split_field
+=func split_field_hash
 
 Split a HTTP header field into a hash with decoding of keys
 
@@ -124,7 +124,7 @@ Split a HTTP header field into a hash with decoding of keys
 
 =cut
 
-sub split_field {
+sub split_field_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my $value = shift;
     return () unless defined $value;
@@ -165,19 +165,20 @@ sub split_field {
     return %data;
 }
 
-=func build_field
 
-The opposite method of L</split_field> with encoding of keys.
+=func build_field_hash
+
+The opposite method of L</split_field_hash> with encoding of keys.
 
     my $field_value = build_field(NoCache => undef, MaxAge => 3600);
     # $field_value = 'no-cache,maxage=3600'
 
 =cut
 
-sub build_field {
+sub build_field_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %data = @_;
-    return join ',', sort map { encode_key($_) . (defined($data{$_}) ? '='.(($data{$_} =~ m{[=,]}) ? '"'.$data{$_}.'"' : $data{$_}) : '') } keys %data;
+    return join ', ', sort map { encode_key($_) . (defined($data{$_}) ? '='.(($data{$_} =~ m{[=,]}) ? '"'.$data{$_}.'"' : $data{$_}) : '') } keys %data;
 }
 
 1;

@@ -3,15 +3,15 @@
 use Test::More;
 use HTTP::Headers::Fancy;
 
-sub build {
-    goto &HTTP::Headers::Fancy::build_field
+sub buildh {
+    goto &HTTP::Headers::Fancy::build_field_hash
 }
 
-is build() => '';
-is build(xxx=>undef) => 'xxx';
-is build(xxx=>undef,yyy=>undef) => 'xxx,yyy';
-is build(xxx=>'',yyy=>undef) => 'xxx=,yyy';
-is build(xxx=>undef,yyy=>'') => 'xxx,yyy=';
-is build(xxx=>'=',yyy=>',') => 'xxx="=",yyy=","';
+is buildh() => '';
+is buildh(xxx=>undef) => 'xxx';
+is buildh(xxx=>undef,yyy=>undef) => 'xxx, yyy';
+is buildh(xxx=>'',yyy=>undef) => 'xxx=, yyy';
+is buildh(xxx=>undef,yyy=>'') => 'xxx, yyy=';
+is buildh(xxx=>'=',yyy=>',') => 'xxx="=", yyy=","';
 
 done_testing;

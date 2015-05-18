@@ -3,24 +3,24 @@
 use Test::More;
 use HTTP::Headers::Fancy;
 
-sub splif {
-    goto &HTTP::Headers::Fancy::split_field
+sub splith {
+    goto &HTTP::Headers::Fancy::split_field_hash
 }
 
-is_deeply { splif() } => {  };
-is_deeply { splif(undef) } => {  };
-is_deeply { splif('') } => {  };
-is_deeply { splif('xxx') } => { Xxx => undef };
-is_deeply { splif('xxx,yyy') } => { Xxx => undef, Yyy => undef };
-is_deeply { splif('xxx=yyy') } => { Xxx => 'yyy' };
-is_deeply { splif('xxx=,zzz') } => { Xxx => '', Zzz => undef };
-is_deeply { splif('xxx,zzz=') } => { Xxx => undef, Zzz => '' };
-is_deeply { splif('xxx=yyy,zzz') } => { Xxx => 'yyy', Zzz => undef };
-is_deeply { splif('xxx=yyy,zzz=aaa') } => { Xxx => 'yyy', Zzz => 'aaa' };
-is_deeply { splif('xxx="yy,yy"') } => { Xxx => 'yy,yy' };
-is_deeply { splif('xxx="yy=yy"') } => { Xxx => 'yy=yy' };
-is_deeply { splif('xxx="yy,yy",yyy="zz=zz"') } => { Xxx => 'yy,yy', Yyy => 'zz=zz' };
-is_deeply { splif('xxx="yy=yy",yyy="zz,zz"') } => { Xxx => 'yy=yy', Yyy => 'zz,zz' };
-is_deeply { splif(' a , b , c ') } => { A => undef, B => undef, C => undef };
+is_deeply { splith() } => {  };
+is_deeply { splith(undef) } => {  };
+is_deeply { splith('') } => {  };
+is_deeply { splith('xxx') } => { Xxx => undef };
+is_deeply { splith('xxx ,yyy') } => { Xxx => undef, Yyy => undef };
+is_deeply { splith('xxx=yyy') } => { Xxx => 'yyy' };
+is_deeply { splith('xxx= , zzz') } => { Xxx => '', Zzz => undef };
+is_deeply { splith('xxx, zzz=') } => { Xxx => undef, Zzz => '' };
+is_deeply { splith('xxx=yyy, zzz') } => { Xxx => 'yyy', Zzz => undef };
+is_deeply { splith('xxx=yyy, zzz=aaa') } => { Xxx => 'yyy', Zzz => 'aaa' };
+is_deeply { splith('xxx="yy,yy"') } => { Xxx => 'yy,yy' };
+is_deeply { splith('xxx="yy=yy"') } => { Xxx => 'yy=yy' };
+is_deeply { splith('xxx="yy,yy", yyy="zz=zz"') } => { Xxx => 'yy,yy', Yyy => 'zz=zz' };
+is_deeply { splith('xxx="yy=yy", yyy="zz,zz"') } => { Xxx => 'yy=yy', Yyy => 'zz,zz' };
+is_deeply { splith(' a , b , c ') } => { A => undef, B => undef, C => undef };
 
 done_testing;

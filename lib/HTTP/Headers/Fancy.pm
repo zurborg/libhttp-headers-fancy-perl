@@ -165,4 +165,19 @@ sub split_field {
     return %data;
 }
 
+=func build_field
+
+The opposite method of L</split_field> with encoding of keys.
+
+    my $field_value = build_field(NoCache => undef, MaxAge => 3600);
+    # $field_value = 'no-cache,maxage=3600'
+
+=cut
+
+sub build_field {
+    shift if defined $_[0] and $_[0] eq __PACKAGE__;
+    my %data = @_;
+    return join ',', sort map { encode_key($_) . (defined($data{$_}) ? '='.(($data{$_} =~ m{[=,]}) ? '"'.$data{$_}.'"' : $data{$_}) : '') } keys %data;
+}
+
 1;

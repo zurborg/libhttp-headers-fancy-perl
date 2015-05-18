@@ -41,7 +41,7 @@ The header field name will be separated by the dash ('-') sign into pieces. Ever
 =cut
 
 sub decode_key {
-    shift if $_[0] eq __PACKAGE__;
+    shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my $k = shift;
     $k =~ s{^([^-]+)}{ucfirst(lc($1))}e;
     $k =~ s{-+([^-]+)}{ucfirst(lc($1))}ge;
@@ -58,7 +58,7 @@ Decode a hash (or HashRef) of HTTP headers and rename the keys
 =cut
 
 sub decode_hash {
-    shift if $_[0] eq __PACKAGE__;
+    shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %headers = @_ == 1 ? %{ +shift } : @_;
     while (my ($old, $val) = each %headers) {
         my $new = decode_key($old);
@@ -85,7 +85,7 @@ Any uppercase (if not at beginning) will be prepended with a dash sign. Undersco
 =cut
 
 sub encode_key {
-    shift if $_[0] eq __PACKAGE__;
+    shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my $k = +shift =~ s{_}{-}gr;
     $k =~ s{([^-])([A-Z])}{$1-$2} while $k =~ m{([^-])([A-Z])};
     return lc($k);
@@ -103,7 +103,7 @@ Removes also a keypair if a value in undefined.
 =cut
 
 sub encode_hash {
-    shift if $_[0] eq __PACKAGE__;
+    shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %headers = @_ == 1 ? %{ +shift } : @_;
     while (my ($old, $val) = each %headers) {
         delete $headers{$old} unless defined $val;

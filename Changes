@@ -2,7 +2,8 @@ Revision history for HTTP-Headers-Fancy
 
 {{$NEXT}}
 
- - New methods split_field and build_field
+ - New methods: split_field_hash, build_field_hash, split_field_list and
+   build_field_list
  - Improve tests
 
 0.001 2015-05-18

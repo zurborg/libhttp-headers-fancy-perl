@@ -7,6 +7,10 @@ sub splith {
     goto &HTTP::Headers::Fancy::split_field_hash
 }
 
+sub splitl {
+    goto &HTTP::Headers::Fancy::split_field_list
+}
+
 is_deeply { splith() } => {  };
 is_deeply { splith(undef) } => {  };
 is_deeply { splith('') } => {  };
@@ -22,5 +26,9 @@ is_deeply { splith('xxx="yy=yy"') } => { Xxx => 'yy=yy' };
 is_deeply { splith('xxx="yy,yy", yyy="zz=zz"') } => { Xxx => 'yy,yy', Yyy => 'zz=zz' };
 is_deeply { splith('xxx="yy=yy", yyy="zz,zz"') } => { Xxx => 'yy=yy', Yyy => 'zz,zz' };
 is_deeply { splith(' a , b , c ') } => { A => undef, B => undef, C => undef };
+
+is_deeply [ splitl('"a"') ] => ['a'];
+is_deeply [ splitl('"a", "b"') ] => ['a', 'b'];
+is_deeply [ splitl('",",","') ] => [',',','];
 
 done_testing;

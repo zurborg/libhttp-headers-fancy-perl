@@ -165,6 +165,38 @@ sub split_field_hash {
     return %data;
 }
 
+=func split_field_list
+
+Split a field into pieces
+
+    my @list = split_field('"a", "b", "c"');
+    # @list = qw( a b c );
+
+=cut
+
+sub split_field_list {
+    shift if defined $_[0] and $_[0] eq __PACKAGE__;
+    my $value = shift;
+    return () unless defined $value;
+    pos($value) = 0;
+    my @data;
+    $value .= ',';
+    while ($value =~ m{
+        \G
+        \s*
+        "
+        (?<value>
+            [^"]*?
+        )
+        "
+        \s*
+        ,+
+        \s*
+    }gsx) {
+        push @data => $+{value};
+    }
+    return @data;
+}
 
 =func build_field_hash
 
@@ -179,6 +211,20 @@ sub build_field_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %data = @_;
     return join ', ', sort map { encode_key($_) . (defined($data{$_}) ? '='.(($data{$_} =~ m{[=,]}) ? '"'.$data{$_}.'"' : $data{$_}) : '') } keys %data;
+}
+
+=func build_field_list
+
+Build a list from pieces
+
+    my $field_value = build_field(qw( a b c ));
+    # $field_value = '"a", "b", "c"'
+
+=cut
+
+sub build_field_list {
+    shift if defined $_[0] and $_[0] eq __PACKAGE__;
+    return join ', ', map { qq{"$_"} } @_;
 }
 
 1;

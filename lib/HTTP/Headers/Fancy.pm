@@ -115,6 +115,15 @@ sub encode_hash {
     wantarray ? %headers : \%headers;
 }
 
+=func split_field
+
+Split a HTTP header field into a hash with decoding of keys
+
+    my %cc = split_field('no-cache, s-maxage=5');
+    # %cc = (NoCache => undef, SMaxage => 5);
+
+=cut
+
 sub split_field {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my $value = shift;
@@ -151,7 +160,7 @@ sub split_field {
         ,+
         \s*
     }gsx) {
-        $data{$+{key}} = $+{value};
+        $data{decode_key($+{key})} = $+{value};
     }
     return %data;
 }

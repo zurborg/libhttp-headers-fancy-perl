@@ -60,14 +60,12 @@ Decode a hash (or HashRef) of HTTP headers and rename the keys
 sub decode_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %headers = @_ == 1 ? %{ +shift } : @_;
-    reset %headers;
-    while ( my ( $old, $val ) = each %headers ) {
+    foreach my $old ( keys %headers ) {
         my $new = decode_key($old);
         if ( $old ne $new ) {
             $headers{$new} = delete $headers{$old};
         }
     }
-    reset %headers;
     wantarray ? %headers : \%headers;
 }
 
@@ -107,15 +105,13 @@ Removes also a keypair if a value in undefined.
 sub encode_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %headers = @_ == 1 ? %{ +shift } : @_;
-    reset %headers;
-    while ( my ( $old, $val ) = each %headers ) {
-        delete $headers{$old} unless defined $val;
+    foreach my $old ( keys %headers ) {
+        delete $headers{$old} unless defined $headers{$old};
         my $new = encode_key($old);
         if ( $old ne $new ) {
             $headers{$new} = delete $headers{$old};
         }
     }
-    reset %headers;
     wantarray ? %headers : \%headers;
 }
 
@@ -179,6 +175,11 @@ Split a field into pieces
     my @list = split_field('"a", "b", "c"');
     # @list = qw( a b c );
 
+Weak values are stored as ScalarRef
+
+    my @list = split_field('"a", W/"b"', W/"c"');
+    # @list = ('a', \'b', \'c');
+
 =cut
 
 sub split_field_list {
@@ -192,6 +193,9 @@ sub split_field_list {
         $value =~ m{
         \G
         \s*
+        (?<weak>
+            W/
+        )?
         "
         (?<value>
             [^"]*?
@@ -204,7 +208,7 @@ sub split_field_list {
       )
     {
 
-        push @data => $+{value};
+        push @data => $+{weak} ? \$+{value} : $+{value};
     }
     return @data;
 }
@@ -238,11 +242,16 @@ Build a list from pieces
     my $field_value = build_field(qw( a b c ));
     # $field_value = '"a", "b", "c"'
 
+ScalarRefs evaluates to a weak value
+
+    my $field_value = build_fiel('a', \'b', \'c');
+    # $field_value = '"a", W/"b", W/"c"';
+
 =cut
 
 sub build_field_list {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
-    return join ', ', map { qq{"$_"} } @_;
+    return join ', ', map { ref($_) ? 'W/"' . $$_ . '"' : qq{"$_"} } @_;
 }
 
 1;

@@ -60,12 +60,14 @@ Decode a hash (or HashRef) of HTTP headers and rename the keys
 sub decode_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %headers = @_ == 1 ? %{ +shift } : @_;
+    reset %headers;
     while ( my ( $old, $val ) = each %headers ) {
         my $new = decode_key($old);
         if ( $old ne $new ) {
             $headers{$new} = delete $headers{$old};
         }
     }
+    reset %headers;
     wantarray ? %headers : \%headers;
 }
 
@@ -105,6 +107,7 @@ Removes also a keypair if a value in undefined.
 sub encode_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %headers = @_ == 1 ? %{ +shift } : @_;
+    reset %headers;
     while ( my ( $old, $val ) = each %headers ) {
         delete $headers{$old} unless defined $val;
         my $new = encode_key($old);
@@ -112,6 +115,7 @@ sub encode_hash {
             $headers{$new} = delete $headers{$old};
         }
     }
+    reset %headers;
     wantarray ? %headers : \%headers;
 }
 

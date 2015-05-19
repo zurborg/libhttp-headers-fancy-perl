@@ -60,9 +60,9 @@ Decode a hash (or HashRef) of HTTP headers and rename the keys
 sub decode_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %headers = @_ == 1 ? %{ +shift } : @_;
-    while (my ($old, $val) = each %headers) {
+    while ( my ( $old, $val ) = each %headers ) {
         my $new = decode_key($old);
-        if ($old ne $new) {
+        if ( $old ne $new ) {
             $headers{$new} = delete $headers{$old};
         }
     }
@@ -105,10 +105,10 @@ Removes also a keypair if a value in undefined.
 sub encode_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %headers = @_ == 1 ? %{ +shift } : @_;
-    while (my ($old, $val) = each %headers) {
+    while ( my ( $old, $val ) = each %headers ) {
         delete $headers{$old} unless defined $val;
         my $new = encode_key($old);
-        if ($old ne $new) {
+        if ( $old ne $new ) {
             $headers{$new} = delete $headers{$old};
         }
     }
@@ -131,7 +131,8 @@ sub split_field_hash {
     pos($value) = 0;
     my %data;
     $value .= ',';
-    while ($value =~ m{
+    while (
+        $value =~ m{
         \G
         \s*
         (?<key>
@@ -159,8 +160,10 @@ sub split_field_hash {
         \s*
         ,+
         \s*
-    }gsx) {
-        $data{decode_key($+{key})} = $+{value};
+    }gsx
+      )
+    {
+        $data{ decode_key( $+{key} ) } = $+{value};
     }
     return %data;
 }
@@ -181,7 +184,8 @@ sub split_field_list {
     pos($value) = 0;
     my @data;
     $value .= ',';
-    while ($value =~ m{
+    while (
+        $value =~ m{
         \G
         \s*
         "
@@ -192,7 +196,10 @@ sub split_field_list {
         \s*
         ,+
         \s*
-    }gsx) {
+    }gsix
+      )
+    {
+
         push @data => $+{value};
     }
     return @data;
@@ -210,7 +217,14 @@ The opposite method of L</split_field_hash> with encoding of keys.
 sub build_field_hash {
     shift if defined $_[0] and $_[0] eq __PACKAGE__;
     my %data = @_;
-    return join ', ', sort map { encode_key($_) . (defined($data{$_}) ? '='.(($data{$_} =~ m{[=,]}) ? '"'.$data{$_}.'"' : $data{$_}) : '') } keys %data;
+    return join ', ', sort map {
+        encode_key($_)
+          . (
+            defined( $data{$_} )
+            ? '='
+              . ( ( $data{$_} =~ m{[=,]} ) ? '"' . $data{$_} . '"' : $data{$_} )
+            : '' )
+    } keys %data;
 }
 
 =func build_field_list

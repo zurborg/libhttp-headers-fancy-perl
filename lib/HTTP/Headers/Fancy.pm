@@ -262,10 +262,17 @@ The opposite method of L</split_field_hash> with encoding of keys.
     my $field_value = build_field_hash(NoCache => undef, MaxAge => 3600);
     # $field_value = 'no-cache,maxage=3600'
 
+An HashRef as first argument is interpreted as hash
+
+    build_field_hash({ NoCache => undef })
+
 =cut
 
 sub build_field_hash {
     my ( $self, @args ) = _self(@_);
+    if ( ref $args[0] eq 'HASH' ) {
+        return $self->build_field_hash( %{ $args[0] } );
+    }
     my %data = @args;
     return join ', ', sort map {
         encode_key($_)
@@ -289,10 +296,17 @@ ScalarRefs evaluates to a weak value
     my $field_value = build_field_list('a', \'b', \'c');
     # $field_value = '"a", W/"b", W/"c"';
 
+An ArrayRef as first argument is interpreted as list
+
+    build_field_list([ 'a', 'b', ... ])
+
 =cut
 
 sub build_field_list {
     my ( $self, @args ) = _self(@_);
+    if ( ref $args[0] eq 'ARRAY' ) {
+        return $self->build_field_list( @{ $args[0] } );
+    }
     return join ', ', map { ref($_) ? 'W/"' . $$_ . '"' : qq{"$_"} } @args;
 }
 

@@ -249,8 +249,8 @@ sub split_field_list {
     }gsix
       )
     {
-
-        push @data => $+{weak} ? \$+{value} : $+{value};
+        my $value = $+{value};
+        push @data => $+{weak} ? \$value : $value;
     }
     return @data;
 }

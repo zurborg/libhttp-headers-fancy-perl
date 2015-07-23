@@ -266,12 +266,17 @@ sub build_field_hash {
     }
     my %data = @args;
     return join ', ', sort map {
-        encode_key($_)
+        $self->encode_key($_)
           . (
             defined( $data{$_} )
             ? '='
-              . ( ( $data{$_} =~ m{[=,]} ) ? '"' . $data{$_} . '"' : $data{$_} )
-            : '' )
+              . (
+                ( $data{$_} =~ m{[=,]} )
+                ? '"' . $data{$_} . '"'
+                : $data{$_}
+              )
+            : ''
+          )
     } keys %data;
 }
 

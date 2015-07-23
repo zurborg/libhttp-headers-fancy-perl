@@ -2,9 +2,24 @@ use strictures 2;
 
 package HTTP::Headers::Fancy;
 
+use Exporter qw(import);
+
 # ABSTRACT: Fancy naming schema of HTTP headers
 
 # VERSION
+
+our @EXPORT_OK = qw(
+  decode_key
+  encode_key
+  decode_hash
+  encode_hash
+  split_field_hash
+  split_field_list
+  build_field_hash
+  build_field_list
+);
+
+our %EXPORT_TAGS = ( all => \@EXPORT_OK, );
 
 =head1 SYNOPSIS
 

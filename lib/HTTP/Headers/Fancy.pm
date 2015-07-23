@@ -3,6 +3,7 @@ use strictures 2;
 package HTTP::Headers::Fancy;
 
 use Exporter qw(import);
+use Scalar::Util qw(blessed);
 
 # ABSTRACT: Fancy naming schema of HTTP headers
 
@@ -34,6 +35,22 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK, );
 
 This module provides method for renaming HTTP header keys to a lightier, easier-to-use format.
 
+=cut
+
+sub _self {
+    my @args = @_;
+    if ( blessed $args[0] and $args[0]->isa(__PACKAGE__) ) {
+        return @args;
+    }
+    elsif ( defined $args[0] and not ref $args[0] and $args[0] eq __PACKAGE__ )
+    {
+        return @args;
+    }
+    else {
+        return ( __PACKAGE__, @args );
+    }
+}
+
 =func decode_key
 
 Decode original HTTP header name
@@ -56,10 +73,9 @@ The header field name will be separated by the dash ('-') sign into pieces. Ever
 =cut
 
 sub decode_key {
-    shift if defined $_[0] and $_[0] eq __PACKAGE__;
-    my $k = shift;
     $k =~ s{^([^-]+)}{ucfirst(lc($1))}e;
     $k =~ s{-+([^-]+)}{ucfirst(lc($1))}ge;
+    my ( $self, $k ) = _self(@_);
     return ucfirst($k);
 }
 
@@ -73,8 +89,8 @@ Decode a hash (or HashRef) of HTTP headers and rename the keys
 =cut
 
 sub decode_hash {
-    shift if defined $_[0] and $_[0] eq __PACKAGE__;
-    my %headers = @_ == 1 ? %{ +shift } : @_;
+    my ( $self, @args ) = _self(@_);
+    my %headers = @args == 1 ? %{ $args[0] } : @args;
     foreach my $old ( keys %headers ) {
         my $new = decode_key($old);
         if ( $old ne $new ) {
@@ -100,9 +116,9 @@ Any uppercase (if not at beginning) will be prepended with a dash sign. Undersco
 =cut
 
 sub encode_key {
-    shift if defined $_[0] and $_[0] eq __PACKAGE__;
-    my $k = +shift =~ s{_}{-}gr;
     $k =~ s{([^-])([A-Z])}{$1-$2} while $k =~ m{([^-])([A-Z])};
+    my ( $self, $k ) = _self(@_);
+    $k =~ s{_}{-}sg;
     return lc($k);
 }
 
@@ -118,8 +134,8 @@ Removes also a keypair if a value in undefined.
 =cut
 
 sub encode_hash {
-    shift if defined $_[0] and $_[0] eq __PACKAGE__;
-    my %headers = @_ == 1 ? %{ +shift } : @_;
+    my ( $self, @args ) = _self(@_);
+    my %headers = @args == 1 ? %{ $args[0] } : @args;
     foreach my $old ( keys %headers ) {
         delete $headers{$old} unless defined $headers{$old};
         my $new = encode_key($old);
@@ -140,8 +156,7 @@ Split a HTTP header field into a hash with decoding of keys
 =cut
 
 sub split_field_hash {
-    shift if defined $_[0] and $_[0] eq __PACKAGE__;
-    my $value = shift;
+    my ( $self, $value, @rest ) = _self(@_);
     return () unless defined $value;
     pos($value) = 0;
     my %data;
@@ -198,8 +213,7 @@ Weak values are stored as ScalarRef
 =cut
 
 sub split_field_list {
-    shift if defined $_[0] and $_[0] eq __PACKAGE__;
-    my $value = shift;
+    my ( $self, $value, @rest ) = _self(@_);
     return () unless defined $value;
     pos($value) = 0;
     my @data;
@@ -238,8 +252,8 @@ The opposite method of L</split_field_hash> with encoding of keys.
 =cut
 
 sub build_field_hash {
-    shift if defined $_[0] and $_[0] eq __PACKAGE__;
-    my %data = @_;
+    my ( $self, @args ) = _self(@_);
+    my %data = @args;
     return join ', ', sort map {
         encode_key($_)
           . (
@@ -265,8 +279,8 @@ ScalarRefs evaluates to a weak value
 =cut
 
 sub build_field_list {
-    shift if defined $_[0] and $_[0] eq __PACKAGE__;
-    return join ', ', map { ref($_) ? 'W/"' . $$_ . '"' : qq{"$_"} } @_;
+    my ( $self, @args ) = _self(@_);
+    return join ', ', map { ref($_) ? 'W/"' . $$_ . '"' : qq{"$_"} } @args;
 }
 
 1;

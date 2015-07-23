@@ -51,6 +51,20 @@ sub _self {
     }
 }
 
+sub _encode_hash_deeply {
+    my ( $self, @args ) = _self(@_);
+    if ( ref $args[0] ) {
+        return { $self->_encode_hash_deeply( %{ $args[0] } ) };
+    }
+    my %hash = $self->encode_hash(@args);
+    foreach my $key ( keys %hash ) {
+        if ( ref $hash{$key} ) {
+            $hash{$key} = $self->build( $hash{$key} );
+        }
+    }
+    return %hash;
+}
+
 =func decode_key
 
 Decode original HTTP header name
@@ -304,6 +318,144 @@ sub build_field_list {
         return $self->build_field_list( @{ $args[0] } );
     }
     return join ', ', map { ref($_) ? 'W/"' . $$_ . '"' : qq{"$_"} } @args;
+}
+
+=method new
+
+Creates a new instance of ourself. No options are supported.
+
+    my $fancy = HTTP::Headers::Fancy->new;
+
+=cut
+
+sub new {
+    my $class = shift // __PACKAGE__;
+    return bless {@_} => ref $class || $class;
+}
+
+=method encode
+
+Wrapper for L</encode_hash> or L</encode_key>, depending on what is given.
+
+    $fancy->encode(%hash)    # encode_hash(%hash);
+    $fancy->encode($hashref) # encode_hash($hashref);
+    $fancy->encode($scalar)  # encode_key($scalar);
+
+=cut
+
+sub encode {
+    my $self = shift;
+    return unless @_;
+    if ( @_ > 1 ) {
+        return $self->_encode_hash_deeply(@_);
+    }
+    elsif ( ref $_[0] eq 'HASH' ) {
+        return $self->_encode_hash_deeply( $_[0] );
+    }
+    else {
+        return $self->encode_key( $_[0] );
+    }
+}
+
+=method decode
+
+Wrapper for L</decode_hash> or L</decode_key>, depending on what is given
+
+    $fancy->decode(%hash)    # decode_hash(%hash);
+    $fancy->decode($hashref) # decode_hash($hashref);
+    $fancy->decode($scalar)  # decode_key($scalar);
+
+=cut
+
+sub decode {
+    my $self = shift;
+    return unless @_;
+    if ( @_ > 1 ) {
+        return $self->decode_hash(@_);
+    }
+    elsif ( ref $_[0] eq 'HASH' ) {
+        return $self->decode_hash( $_[0] );
+    }
+    else {
+        return $self->decode_key( $_[0] );
+    }
+}
+
+=method split
+
+Wrapper for L</split_field_list> or L</split_field_hash>, depending on what is given
+
+    $fancy->split(q{"a", "b", "c"}) # split_field_list(...)
+    $fancy->split(q{W/"a", ...})    # split_field_list(...)
+    $fancy->split(q{no-cache})      # split_field_hash(...)
+
+Or deflate a HashRef directly:
+
+    $headers = $fancy->decode(...);
+    $fancy->split($headers, qw(CacheControl Etag));
+    $headers->{CacheControl}->{NoCache};
+    $headers->{Etag}->[0];
+
+=cut
+
+sub split {
+    my $self = shift;
+    return unless @_;
+    my $val = shift;
+    if ( $val =~ m{^ \s* ( W/ ) ? " }six ) {
+        return $self->split_field_list($val);
+    }
+    elsif ( not ref $val ) {
+        return $self->split_field_hash($val);
+    }
+    elsif ( ref $val eq 'HASH' ) {
+        foreach my $key (@_) {
+            next unless $val->{$key};
+            if ( $val->{$key} =~ m{^ \s* ( W/ )? " }six ) {
+                $val->{$key} = [ $self->split_field_list( $val->{$key} ) ];
+            }
+            else {
+                $val->{$key} = { $self->split_field_hash( $val->{$key} ) };
+            }
+        }
+        return $val;
+    }
+}
+
+=method build
+
+Wrapper for L</build_field_hash> or L</build_field_list>
+
+    $fancy->build(NoCache => undef) # build_field_hash(...)
+    $fancy->build({ ... }) # build_field_hash(...)
+    $fancy->build([ ... ]) # build_field_list(...)
+
+=cut
+
+sub build {
+    my $self = shift;
+    if ( ref $_[0] eq 'HASH' ) {
+        return $self->build_field_hash(@_);
+    }
+    elsif ( ref $_[0] eq 'ARRAY' ) {
+        return $self->build_field_list(@_);
+    }
+    else {
+        return $self->build_field_hash(@_);
+    }
+}
+
+=method etags
+
+Wrapper for L</build_field_list>
+
+    $fancy->build('a', \'b', 'c') # build_field_list(...)
+
+=cut
+
+sub etags {
+    my $self = shift;
+    return $self->build_field_list(@_);
 }
 
 1;

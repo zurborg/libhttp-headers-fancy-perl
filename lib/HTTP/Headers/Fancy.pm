@@ -26,9 +26,9 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK, );
 
     my %fancy = decode_hash('content-type' => ..., 'x-foo-bar-baf-baz' => ...);
     my $content_type = $fancy{ContentType};
-    my $x_foo_bar_baf_baz = $fancy{XFooBarBafBaz};
+    my $x_foo_bar_baf_baz = $fancy{-FooBarBafBaz};
     
-    my %headers = encode_hash(ContentType => ..., x_foo_bar => ...);
+    my %headers = encode_hash(ContentType => ..., -foo_bar => ...);
     # %headers = ('content-type' => ..., 'x-foo-bar' => ...);
 
 =head1 DESCRIPTION

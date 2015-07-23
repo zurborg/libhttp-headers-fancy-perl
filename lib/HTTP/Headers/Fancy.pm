@@ -268,12 +268,12 @@ sub build_field_hash {
 
 Build a list from pieces
 
-    my $field_value = build_field(qw( a b c ));
+    my $field_value = build_field_list(qw( a b c ));
     # $field_value = '"a", "b", "c"'
 
 ScalarRefs evaluates to a weak value
 
-    my $field_value = build_fiel('a', \'b', \'c');
+    my $field_value = build_field_list('a', \'b', \'c');
     # $field_value = '"a", W/"b", W/"c"';
 
 =cut

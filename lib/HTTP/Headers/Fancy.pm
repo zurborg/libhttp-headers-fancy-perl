@@ -259,7 +259,7 @@ sub split_field_list {
 
 The opposite method of L</split_field_hash> with encoding of keys.
 
-    my $field_value = build_field(NoCache => undef, MaxAge => 3600);
+    my $field_value = build_field_hash(NoCache => undef, MaxAge => 3600);
     # $field_value = 'no-cache,maxage=3600'
 
 =cut

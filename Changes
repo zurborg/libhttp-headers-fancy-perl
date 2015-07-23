@@ -1,21 +1,22 @@
 Revision history for HTTP-Headers-Fancy
 
 {{$NEXT}}
+ [API CHANGES]
+ - Experimental headers
 
+ [BUG FIXES]
+ - Weak etags are now return correctly
+
+ [DOCUMENTATION]
+ - More and hopefully better
+
+ [ENHANCEMENTS]
  - New methods: split_field_hash, build_field_hash, split_field_list and
    build_field_list
  - Improve tests
 
 0.001 2015-05-18
  - Initial release
-
- [API CHANGES]
-
- [BUG FIXES]
-
- [DOCUMENTATION]
-
- [ENHANCEMENTS]
 
 0.000 0000-00-00
 

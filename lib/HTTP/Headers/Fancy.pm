@@ -65,17 +65,23 @@ The header field name will be separated by the dash ('-') sign into pieces. Ever
     # aCCEPT   Accept
     # Acc-Ept  AccEpt
     # Content-Type ContentType
-    # x-y-z    XYZ
-    # xyz      Xyz
-    # x-yz     XYz
-    # xy-z     XyZ
+    # a-b-c    ABC
+    # abc      Abc
+    # a-bc     ABc
+    # ab-c     AbC
+
+Experimental headers starting with C<X-> will be accessable by a preleading dash sign:
+
+    # Original -> Fancy
+    # x-abc    -Abc
 
 =cut
 
 sub decode_key {
-    $k =~ s{^([^-]+)}{ucfirst(lc($1))}e;
-    $k =~ s{-+([^-]+)}{ucfirst(lc($1))}ge;
     my ( $self, $k ) = _self(@_);
+    $k =~ s{^([^-]+)}{ucfirst(lc($1))}se;
+    $k =~ s{-+([^-]+)}{ucfirst(lc($1))}sge;
+    $k =~ s{^X([A-Z])}{-$1}s;
     return ucfirst($k);
 }
 
@@ -113,12 +119,19 @@ Any uppercase (if not at beginning) will be prepended with a dash sign. Undersco
     # foo_bar  foo-bar
     # FoOoOoF  fo-oo-oo-f
 
+Experimental headers starting with C<X-> are also createable with a preleading dash sign:
+
+    # Fancy -> Original
+    # -foo     x-foo
+
 =cut
 
 sub encode_key {
-    $k =~ s{([^-])([A-Z])}{$1-$2} while $k =~ m{([^-])([A-Z])};
     my ( $self, $k ) = _self(@_);
     $k =~ s{_}{-}sg;
+    $k =~ s{-+}{-}sg;
+    $k =~ s{^-(.)}{'X'.uc($1)}se;
+    $k =~ s{([^-])([A-Z])}{$1-$2}s while $k =~ m{([^-])([A-Z])}s;
     return lc($k);
 }
 

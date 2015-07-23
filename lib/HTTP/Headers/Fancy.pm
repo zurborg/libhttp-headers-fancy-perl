@@ -191,36 +191,8 @@ sub split_field_hash {
     pos($value) = 0;
     my %data;
     $value .= ',';
-    while (
-        $value =~ m{
-        \G
-        \s*
-        (?<key>
-            [^=,]+?
-        )
-        \s*
-        (?:
-            \s*
-            =
-            \s*
-            (?:
-                (?:
-                    "
-                    (?<value>
-                        [^"]*?
-                    )
-                    "
-                )
-            |
-                (?<value>
-                    [^,]*?
-                )
-            )
-        )?
-        \s*
-        ,+
-        \s*
-    }gsx
+    while ( $value =~
+m{ \G \s* (?<key> [^=,]+? ) \s* (?: \s* = \s* (?: (?: " (?<value> [^"]*? ) " ) | (?<value> [^,]*? ) ) )? \s* ,+ \s* }gsx
       )
     {
         $data{ decode_key( $+{key} ) } = $+{value};
@@ -265,23 +237,8 @@ sub split_field_list {
     pos($value) = 0;
     my @data;
     $value .= ',';
-    while (
-        $value =~ m{
-        \G
-        \s*
-        (?<weak>
-            W/
-        )?
-        "
-        (?<value>
-            [^"]*?
-        )
-        "
-        \s*
-        ,+
-        \s*
-    }gsix
-      )
+    while ( $value =~
+        m{ \G \s* (?<weak> W/ )? " (?<value> [^"]*? ) " \s* ,+ \s* }gsix )
     {
         my $value = $+{value};
         push @data => $+{weak} ? \$value : $value;

@@ -166,11 +166,28 @@ Split a HTTP header field into a hash with decoding of keys
     my %cc = split_field('no-cache, s-maxage=5');
     # %cc = (NoCache => undef, SMaxage => 5);
 
+Or deflate fields in a hashref directly:
+
+    # First, get a fancy hashref of header fields;
+    my $headers = decode_hash(...);
+    # Second deflate the CacheControl field
+    split_field_hash($headers, qw( CacheControl ));
+    # Then access the fancy way
+    $headers->{CacheControl}->{SMaxage};
+
+The first argument has to be a hashref, all other argument a list of fields to be deflated by I<split_field_hash>
+
 =cut
 
 sub split_field_hash {
     my ( $self, $value, @rest ) = _self(@_);
     return () unless defined $value;
+    if ( ref $value eq 'HASH' ) {
+        foreach my $key (@rest) {
+            $value->{$key} = { $self->split_field_hash( $value->{$key} ) };
+        }
+        return $value;
+    }
     pos($value) = 0;
     my %data;
     $value .= ',';
@@ -223,11 +240,28 @@ Weak values are stored as ScalarRef
     my @list = split_field('"a", W/"b"', W/"c"');
     # @list = ('a', \'b', \'c');
 
+Or deflate fields in a hashref directly:
+
+    # First, get a fancy hashref of header fields;
+    my $headers = decode_hash(...);
+    # Second deflate the Etag field
+    split_field_list($headers, qw( Etag ));
+    # Then access the fancy way
+    $headers->{Etag}->[0];
+
+The first argument has to be a hashref, all other argument a list of fields to be deflated by I<split_field_list>
+
 =cut
 
 sub split_field_list {
     my ( $self, $value, @rest ) = _self(@_);
     return () unless defined $value;
+    if ( ref $value eq 'HASH' ) {
+        foreach my $key (@rest) {
+            $value->{$key} = [ $self->split_field_list( $value->{$key} ) ];
+        }
+        return $value;
+    }
     pos($value) = 0;
     my @data;
     $value .= ',';

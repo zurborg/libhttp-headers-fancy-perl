@@ -173,6 +173,31 @@ sub encode_hash {
     wantarray ? %headers : \%headers;
 }
 
+=func prettify_key
+
+Reformats a key with all lowercase and each part uppercase first.
+
+    my $pretty_key = prettify_key('foo-bar');
+
+Examples:
+
+    # Unpretty  ->  Pretty
+    # foo-bar       Foo-Bar
+    # x-fooof       X-Fooof
+    # ABC-DEF       Abc-Def
+
+Since a HTTP header parser ignores the case, this is just for a nice human-readable output.
+
+=cut
+
+sub prettify_key {
+    my ( $self, $k ) = _self(@_);
+    $k = lc $k;
+    $k =~ s{-+}{-}g;
+    $k =~ s{(-)(.)}{$1.ucfirst($2)}eg;
+    return ucfirst $k;
+}
+
 =func split_field_hash
 
 Split a HTTP header field into a hash with decoding of keys

@@ -27,7 +27,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK, );
     my %fancy = decode_hash('content-type' => ..., 'x-foo-bar-baf-baz' => ...);
     my $content_type = $fancy{ContentType};
     my $x_foo_bar_baf_baz = $fancy{-FooBarBafBaz};
-    
+
     my %headers = encode_hash(ContentType => ..., -foo_bar => ...);
     # %headers = ('content-type' => ..., 'x-foo-bar' => ...);
 
@@ -127,7 +127,7 @@ Encode fancy key name to a valid HTTP header key name
     my $new = encode_key($old);
 
 Any uppercase (if not at beginning) will be prepended with a dash sign. Underscores will be replaced by a dash-sign too. The result will be lowercased.
-    
+
     # Fancy -> Original
     # FooBar   foo-bar
     # foo_bar  foo-bar

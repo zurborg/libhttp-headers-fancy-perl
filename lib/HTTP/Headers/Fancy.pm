@@ -73,21 +73,21 @@ Decode original HTTP header name
 
 The header field name will be separated by the dash ('-') sign into pieces. Every piece will be lowercased and the first character uppercased. The pieces will be concatenated.
 
-    # Original -> Fancy
-    # Accept   Accept
-    # accept   Accept
-    # aCCEPT   Accept
-    # Acc-Ept  AccEpt
-    # Content-Type ContentType
-    # a-b-c    ABC
-    # abc      Abc
-    # a-bc     ABc
-    # ab-c     AbC
+    # Original  ->  Fancy
+    # Accept        Accept
+    # accept        Accept
+    # aCCEPT        Accept
+    # Acc-Ept       AccEpt
+    # Content-Type  ContentType
+    # a-b-c         ABC
+    # abc           Abc
+    # a-bc          ABc
+    # ab-c          AbC
 
 Experimental headers starting with C<X-> will be accessable by a preleading dash sign:
 
-    # Original -> Fancy
-    # x-abc    -Abc
+    # Original  ->  Fancy
+    # x-abc         -Abc
 
 =cut
 
